@@ -188,3 +188,41 @@ def calculate_waypoints(lat,lon,alt,box_size):
     return waypoints
 
 ```
+
+The following function computes the distance in meters between two locations. This function is used to check the vehicle has reached a desired location 
+
+```python
+def get_distance_between_points(lat1,lon1,lat2,lon2):
+
+ 	"""
+	Returns the distance in meters between two points (lat1,lon1) and (lat2,lon2)
+ 	"""
+ 	return Geodesic.WGS84.Inverse(lat1,lon1, lat2, lon2)['s12']
+```
+
+
+Use the selected home location to create the waypoints:
+
+```python
+lat=2.148971
+lon=-73.944397
+alt=40
+box_size = 100
+waypoints = calculate_waypoints(lat,lon,alt,box_size)
+```
+
+Move the vehicle to the waypoints and return home (The vehicle is to be ARMED and in the air
+
+```python
+for wp in waypoints:
+    location = LocationGlobalRelative(wp[0], wp[1], wp[2])
+    vehicle.simple_goto(location)
+    ## Wait till reaching the current waypoint
+    while True:
+        cP=vehicle.location.global_relative_frame.__dict__
+        cla=cP['lat']
+        clo=cP['lon']
+        if get_distance_between_points(cla,clo,wp[0],wp[1]) < 1: break
+vehicle.mode = VehicleMode("RTL")
+```
+
