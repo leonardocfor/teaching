@@ -30,7 +30,7 @@ The following sections asume the usage of the previous example
 
 Use _connect_ function from dronekit connect to port 14550
 
-```
+```python
 from dronekit import connect
 vehicle = connect('127.0.0.1:14550',wait_ready = True)
 ```
@@ -46,7 +46,7 @@ Using APM Planner 2 connect to port 14551
 
 Before attempting arming, check the vehicle is armable, i.e. it has passed pre-arming tests, e.g. compass calibration, etc
 
-```
+```python
 print(vehicle.is_armable)
 ```
 
@@ -57,7 +57,7 @@ If True, the vehicle can be armed
 
 To proceed with arming, the vehicle is to be set in GUIDED mode previously
 
-```
+```python
 from dronekit import VehicleMode
 vehicle.mode = VehicleMode('GUIDED')
 vehicle.armed = True
@@ -68,13 +68,13 @@ vehicle.armed = True
 
 This instructions apply for flying vehicles e.g. ArduCopter, etc. Set TARGET_ALTITUDE to desired value 
 
-```
+```python
 vehicle.simple_takeoff(TARGET_ALTITUDE)
 ```
 
 If using Python's interactive console execute arming and taking off instruction in one line, i.e.
 
-```
+```python
 vehicle.armed = True; vehicle.simple_takeoff(TARGET_ALTITUDE)
 ```
 
@@ -83,7 +83,7 @@ vehicle.armed = True; vehicle.simple_takeoff(TARGET_ALTITUDE)
 
 To check the vehicle's current altitude, use its location.global_relative_frame.alt, for example
 
-```
+```python
 while True:
   if abs(TARGET_ALTITUDE - vehicle.location.global_relative_frame.alt) <= 1:
     print('Selected altitude was reached')
@@ -93,11 +93,12 @@ while True:
   
 ```
 
-#### Check which information provides the vehicle object
+#### Check the information provided by the vehicle object
+---
 
 Code taken from [DroneKit Vehicle state example](https://github.com/dronekit/dronekit-python/blob/master/examples/vehicle_state/vehicle_state.py)
 
-```
+```python
 print("\nGet all vehicle attribute values:")
 print(" Autopilot Firmware version: %s" % vehicle.version)
 print("   Major version number: %s" % vehicle.version.major)
@@ -148,7 +149,7 @@ print(" Armed: %s" % vehicle.armed)    # settable
 
 To return home and land (in case of flying vehicles) set the mode to RTL
 
-```
+```python
 vehicle.mode = VehicleMode("RTL")
 ```
 
@@ -157,7 +158,7 @@ vehicle.mode = VehicleMode("RTL")
 
 Using the class _LocationGlobalRelative_ is possible to command the vehicle to move to a particular location, for example:
 
-```
+```python
 from dronekit import LocationGlobalRelative
 location = LocationGlobalRelative(2.148970999989359, -73.94421721134503, TARGET_ALTITUDE)
 vehicle.simple_goto(location) ## With default (autopilot) groundspeed and airspeed
@@ -165,6 +166,69 @@ vehicle.simple_goto(location, groundspeed=10) ## With groundspeed of 10 [m/s]
 vehicle.simple_goto(location, airspeed=10) ## With airspeed of 10 [m/s]
 ```
 
+#### Move the vehicle to a set of points and return home
+---
+
+To calculate the latitude, longitude and altitude of the target points install the library _geographiclib_ with
+
+```shell
+pip install geographiclib
+```
+
+The following function calculates a set of waypoints around a central location 
+
+```python
+from geographiclib.geodesic import Geodesic
+def calculate_waypoints(lat,lon,alt,box_size):
+    """
+    Function to create a box (size of box_size[m]) of waypoints around a selected location (lat,lon,alt)
+    """
+    waypoints = []
+    for degree in range(0,360,45):
+        waypoint = Geodesic.WGS84.Direct(lat,lon,degree,box_size)
+        waypoints.append([waypoint['lat2'],waypoint['lon2'],alt])
+    return waypoints
+
+```
+
+The following function computes the distance in meters between two locations. This function is used to check the vehicle has reached a desired location 
+
+```python
+def get_distance_between_points(lat1,lon1,lat2,lon2):
+
+ 	"""
+	Returns the distance in meters between two points (lat1,lon1) and (lat2,lon2)
+ 	"""
+ 	return Geodesic.WGS84.Inverse(lat1,lon1, lat2, lon2)['s12']
+```
 
 
+Use the selected home location to create the waypoints:
 
+```python
+lat=2.148971
+lon=-73.944397
+alt=40
+box_size = 100
+waypoints = calculate_waypoints(lat,lon,alt,box_size)
+```
+
+Move the vehicle to the waypoints and return home (The vehicle is to be ARMED and in the air)
+
+```python
+for wp in waypoints:
+    location = LocationGlobalRelative(wp[0], wp[1], wp[2])
+    vehicle.simple_goto(location)
+    ## Wait till reaching the current waypoint
+    while True:
+        cP=vehicle.location.global_relative_frame.__dict__
+        cla=cP['lat']
+        clo=cP['lon']
+        if get_distance_between_points(cla,clo,wp[0],wp[1]) < 1: break
+vehicle.mode = VehicleMode("RTL")
+```
+
+#### More advanced example 
+---
+
+For a more advanced example see [here](https://github.com/leonardocfor/multi-robot-vicsek)
