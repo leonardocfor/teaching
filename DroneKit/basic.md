@@ -166,6 +166,7 @@ vehicle.simple_goto(location, airspeed=10) ## With airspeed of 10 [m/s]
 ```
 
 #### Move the vehicle to a set of points and return home
+---
 
 To calculate the latitude, longitude and altitude of the target points install the library _geographiclib_ with
 
@@ -226,3 +227,6 @@ for wp in waypoints:
 vehicle.mode = VehicleMode("RTL")
 ```
 
+#### More advanced example 
+
+For a more advanced example see [here](https://github.com/leonardocfor/multi-robot-vicsek)
