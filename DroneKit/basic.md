@@ -165,7 +165,7 @@ vehicle.simple_goto(location, groundspeed=10) ## With groundspeed of 10 [m/s]
 vehicle.simple_goto(location, airspeed=10) ## With airspeed of 10 [m/s]
 ```
 
-#### Move the vechile to a set of points and land
+#### Move the vehicle to a set of points and return home
 
 To calculate the latitude, longitude and altitude of the target points install the library _geographiclib_ with
 
@@ -211,7 +211,7 @@ box_size = 100
 waypoints = calculate_waypoints(lat,lon,alt,box_size)
 ```
 
-Move the vehicle to the waypoints and return home (The vehicle is to be ARMED and in the air
+Move the vehicle to the waypoints and return home (The vehicle is to be ARMED and in the air)
 
 ```python
 for wp in waypoints:
