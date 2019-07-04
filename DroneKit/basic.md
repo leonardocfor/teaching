@@ -30,7 +30,7 @@ The following sections asume the usage of the previous example
 
 Use _connect_ function from dronekit connect to port 14550
 
-```
+```python
 from dronekit import connect
 vehicle = connect('127.0.0.1:14550',wait_ready = True)
 ```
@@ -46,7 +46,7 @@ Using APM Planner 2 connect to port 14551
 
 Before attempting arming, check the vehicle is armable, i.e. it has passed pre-arming tests, e.g. compass calibration, etc
 
-```
+```python
 print(vehicle.is_armable)
 ```
 
@@ -57,7 +57,7 @@ If True, the vehicle can be armed
 
 To proceed with arming, the vehicle is to be set in GUIDED mode previously
 
-```
+```python
 from dronekit import VehicleMode
 vehicle.mode = VehicleMode('GUIDED')
 vehicle.armed = True
@@ -68,13 +68,13 @@ vehicle.armed = True
 
 This instructions apply for flying vehicles e.g. ArduCopter, etc. Set TARGET_ALTITUDE to desired value 
 
-```
+```python
 vehicle.simple_takeoff(TARGET_ALTITUDE)
 ```
 
 If using Python's interactive console execute arming and taking off instruction in one line, i.e.
 
-```
+```python
 vehicle.armed = True; vehicle.simple_takeoff(TARGET_ALTITUDE)
 ```
 
@@ -83,7 +83,7 @@ vehicle.armed = True; vehicle.simple_takeoff(TARGET_ALTITUDE)
 
 To check the vehicle's current altitude, use its location.global_relative_frame.alt, for example
 
-```
+```python
 while True:
   if abs(TARGET_ALTITUDE - vehicle.location.global_relative_frame.alt) <= 1:
     print('Selected altitude was reached')
@@ -97,7 +97,7 @@ while True:
 
 Code taken from [DroneKit Vehicle state example](https://github.com/dronekit/dronekit-python/blob/master/examples/vehicle_state/vehicle_state.py)
 
-```
+```python
 print("\nGet all vehicle attribute values:")
 print(" Autopilot Firmware version: %s" % vehicle.version)
 print("   Major version number: %s" % vehicle.version.major)
@@ -148,7 +148,7 @@ print(" Armed: %s" % vehicle.armed)    # settable
 
 To return home and land (in case of flying vehicles) set the mode to RTL
 
-```
+```python
 vehicle.mode = VehicleMode("RTL")
 ```
 
@@ -157,7 +157,7 @@ vehicle.mode = VehicleMode("RTL")
 
 Using the class _LocationGlobalRelative_ is possible to command the vehicle to move to a particular location, for example:
 
-```
+```python
 from dronekit import LocationGlobalRelative
 location = LocationGlobalRelative(2.148970999989359, -73.94421721134503, TARGET_ALTITUDE)
 vehicle.simple_goto(location) ## With default (autopilot) groundspeed and airspeed
@@ -165,6 +165,26 @@ vehicle.simple_goto(location, groundspeed=10) ## With groundspeed of 10 [m/s]
 vehicle.simple_goto(location, airspeed=10) ## With airspeed of 10 [m/s]
 ```
 
+#### Move the vechile to a set of points and land
 
+To calculate the latitude, longitude and altitude of the target points install the library _geographiclib_ with
 
+```shell
+pip install geographiclib
+```
 
+The following function calculates a set of waypoints around a central location 
+
+```python
+from geographiclib.geodesic import Geodesic
+def calculate_waypoints(lat,lon,alt,box_size):
+    """
+    Function to create a box (size of box_size[m]) of waypoints around a selected location (lat,lon,alt)
+    """
+    waypoints = []
+    for degree in range(0,360,45):
+        waypoint = Geodesic.WGS84.Direct(lat,lon,degree,box_size)
+        waypoints.append([waypoint['lat2'],waypoint['lon2'],alt])
+    return waypoints
+
+```
