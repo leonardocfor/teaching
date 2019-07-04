@@ -93,7 +93,8 @@ while True:
   
 ```
 
-#### Check which information provides the vehicle object
+#### Check the information provided by the vehicle object
+---
 
 Code taken from [DroneKit Vehicle state example](https://github.com/dronekit/dronekit-python/blob/master/examples/vehicle_state/vehicle_state.py)
 
@@ -228,5 +229,6 @@ vehicle.mode = VehicleMode("RTL")
 ```
 
 #### More advanced example 
+---
 
 For a more advanced example see [here](https://github.com/leonardocfor/multi-robot-vicsek)
