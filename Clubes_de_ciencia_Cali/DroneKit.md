@@ -39,7 +39,6 @@ The connect function returns an object of class _dronekit.Vehicle_, which can be
 
 Using APM Planner 2 connect to port 14551
 
-Inline-style: 
 ![alt text](https://github.com/leonardocfor/teaching/blob/master/Clubes_de_ciencia_Cali/APMPlanner2.png "APM Planner2")
 
 #### Check the vehicle is armable
