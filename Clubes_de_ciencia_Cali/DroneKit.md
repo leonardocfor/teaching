@@ -28,7 +28,7 @@ The following sections asume the usage of the previous example
 #### Connect to the vehicle 
 ---
 
-Use connect function from dronekit
+Use _connect_ function from dronekit connect to port 14550
 
 ```
 from dronekit import connect
@@ -36,6 +36,11 @@ vehicle = connect('127.0.0.1:14550',wait_ready = True)
 ```
 
 The connect function returns an object of class _dronekit.Vehicle_, which can be used to interact with the autopilot
+
+Using APM Planner 2 connect to port 14551
+
+Inline-style: 
+![alt text](https://github.com/leonardocfor/teaching/blob/master/Clubes_de_ciencia_Cali/APMPlanner2.png "APM Planner2")
 
 #### Check the vehicle is armable
 ---
